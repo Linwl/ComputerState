@@ -5,85 +5,45 @@
     <title>服务器状态</title>
     <script src="{{static_url('Js/echarts.js')}}"></script>
     <script src="{{static_url('Js/jquery_3.2.1.js')}}"></script>
+    <script src="{{static_url('Js/external.js')}}"></script>
+    <link rel="stylesheet" href="{{static_url('Css/basic.css')}}" type="text/css" />
     <script type="text/javascript">
+        var cpuarr = new Array();
+        var memarr = new Array();
+        var interval =new Array();
+        for(var i=0;i<60;i++)
+        {
+        interval.push(i);
+        }
         $(document).ready(function(){
-          // 基于准备好的dom，初始化echarts图表
-           var myChart = echarts.init(document.getElementById('pie'));
-           var cpu_status =$("#cpustatus").html().trim()
-           setInterval ("getCPUstate()", 5000);
-           var memory_state =30
-        option = {
-    title : {
-        text: 'CPU使用变化率',
-        subtext: '数据来自服务器'
-    },
-    tooltip : {
-        trigger: 'axis'
-    },
-    legend: {
-        data:['CPU利用率','间隔']
-    },
-    toolbox: {
-        show : true,
-        feature : {
-            mark : {show: true},
-            dataView : {show: true, readOnly: false},
-            magicType : {show: true, type: ['line', 'bar']},
-            restore : {show: true},
-            saveAsImage : {show: true}
-        }
-    },
-    calculable : true,
-    xAxis : [
-        {
-            type : 'category',
-            boundaryGap : false,
-            data : ['0','15','30','45','60']
-        }
-    ],
-    yAxis : [
-        {
-            type : 'value',
-            axisLabel : {
-                formatter: '{value} %'
-            }
-        }
-    ],
-    series : [
-        {
-            name:'最高气温',
-            type:'line',
-            data:[11, 11, 15, 13, 12, 13, 10],
-            markPoint : {
-                data : [
-                    {type : 'max', name: '最大值'},
-                    {type : 'min', name: '最小值'}
-                ]
-            },
-            markLine : {
-                data : [
-                    {type : 'average', name: '平均值'}
-                ]
-            }
-        }
-    ]
-};
 
-
-
-            // 为echarts对象加载数据
-            myChart.setOption(option);
+         setInterval("getCPUstate()", 1000);
+         setInterval("getMemorystate()", 1000);
+         var cpustatus = $("#cpustatus").html().trim();
+         var memorystate = $("#memorystate").html().trim();
+         InitCpuChart(cpustatus);
+         InitMemoryChart(memorystate);
         });
-
     </script>
 
 </head>
 <body>
 <h2>服务器CPU状态</h2>
-<p><label id="cpustatus">{{Cpu_Status}}</label></p>
-<p><label id="memorystate">{{Memory_state}}</label></p>
+<p>
+    <label>CPU利用率为:</label>
+    <text id="cpustatus">{{Cpu_Status}}</text>%
+</p>
+<p>
+     <label>内存:</label>
+    <text id="memorystate">{{Memory_state}}</text>%
+</p>
 <hr>
-<div id="pie"  style="height:400px"></div>
+<div style=" height: 420px;width:100%;">
+    <div id="cpu" class="dom">
+    </div>
+    <div id="memory" class="dom" style="margin-left:20px;">
+    </div>
+</div>
 <hr>
 </body>
 </html>

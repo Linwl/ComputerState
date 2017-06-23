@@ -24,11 +24,7 @@ class ServerMonitor:
     # 获取电脑内存使用状态
     def getMemorystate(self):
         phymem = psutil.virtual_memory()
-        line = "Memory: %5s%% %6s/%s" % (
-            phymem.percent,
-            str(int(phymem.used / 1024 / 1024)) + "M",
-            str(int(phymem.total / 1024 / 1024)) + "M"
-        )
+        line = phymem.percent
         return line
 
     def bytes2human(self,n):
