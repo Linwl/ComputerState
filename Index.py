@@ -10,6 +10,7 @@ import tornado.web
 from tornado.options import define, options
 from Service import ServerMonitor
 import ConfigParser
+from Service import LogginMange
 
 
 TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), "templates")
@@ -35,6 +36,9 @@ class Application(tornado.web.Application):
 
 class IndexHandler(tornado.web.RequestHandler):
 
+     def init_log(self):
+         return  LogginMange.LogginMange("Index", "Config/logger.conf")
+
      def get(self):
         server = ServerMonitor.ServerMonitor()
         cpustatus =server.getCPUstate(1)
@@ -51,7 +55,7 @@ class IndexHandler(tornado.web.RequestHandler):
              memorystate = server.getMemorystate()
              self.write(str(memorystate))
          else:
-             print '错误的请求!'
+             self.init_log().debug("错误的请求!")
 
 
 
@@ -59,13 +63,18 @@ class IndexHandler(tornado.web.RequestHandler):
 
 
 def main():
-    config = ConfigParser.ConfigParser()
-    config.readfp(open('Config/Init.congfig'), "rb")
-    port = int(config.get('Server_config', 'port_one'))
-    tornado.options.parse_command_line()
-    http_server = tornado.httpserver.HTTPServer(Application())
-    http_server.listen(port)
-    tornado.ioloop.IOLoop.instance().start()
+    log = LogginMange.LogginMange("Index", "Config/logger.conf")
+    try:
+        config = ConfigParser.ConfigParser()
+        config.readfp(open('Config/Init.congfig'), "rb")
+        port = int(config.get('Server_config', 'port_one'))
+        tornado.options.parse_command_line()
+        http_server = tornado.httpserver.HTTPServer(Application())
+        http_server.listen(port)
+        tornado.ioloop.IOLoop.instance().start()
+        log.info("开始服务器监控")
+    except Exception,e:
+        log.error(e.message)
 
 if __name__ == "__main__":
     main()

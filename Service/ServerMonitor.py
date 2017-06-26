@@ -7,6 +7,7 @@ import os
 import atexit
 import time
 import psutil
+from Service import LogginMange
 
 time.sleep(3)
 
@@ -14,8 +15,6 @@ line_num = 1
 
 
 class ServerMonitor:
-    def __init__(self):
-        print "开始进行服务器监控"
 
     # 获取CPU状态;
     def getCPUstate(self,interval=1):
@@ -26,6 +25,13 @@ class ServerMonitor:
         phymem = psutil.virtual_memory()
         line = phymem.percent
         return line
+
+    def Get_NetworkTotalSent(self):
+        tot_before = psutil.net_io_counters()
+        pnic_before = psutil.net_io_counters(pernic=True)
+        tot_after = psutil.net_io_counters()
+        return self.bytes2human(tot_after.bytes_sent)
+
 
     def bytes2human(self,n):
         """
