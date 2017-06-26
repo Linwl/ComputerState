@@ -58,23 +58,22 @@ class IndexHandler(tornado.web.RequestHandler):
              self.init_log().debug("错误的请求!")
 
 
+class ServerMonitoring():
+    """
+    服务器监控
+    """
+    # def __init__(self):
+    #     self.log = LogginMange.LogginMange("Index", "Config/logger.conf")
 
-
-
-
-def main():
-    log = LogginMange.LogginMange("Index", "Config/logger.conf")
-    try:
-        config = ConfigParser.ConfigParser()
-        config.readfp(open('Config/Init.congfig'), "rb")
-        port = int(config.get('Server_config', 'port_one'))
-        tornado.options.parse_command_line()
-        http_server = tornado.httpserver.HTTPServer(Application())
-        http_server.listen(port)
-        tornado.ioloop.IOLoop.instance().start()
-        log.info("开始服务器监控")
-    except Exception,e:
-        log.error(e.message)
-
-if __name__ == "__main__":
-    main()
+    def start(self):
+        try:
+            config = ConfigParser.ConfigParser()
+            config.readfp(open('Config/Init.congfig'), "rb")
+            port = int(config.get('Server_config', 'port_one'))
+            tornado.options.parse_command_line()
+            http_server = tornado.httpserver.HTTPServer(Application())
+            http_server.listen(port)
+            tornado.ioloop.IOLoop.instance().start()
+            self.log.info("开始服务器监控")
+        except Exception, e:
+            self.log.error(e.message)

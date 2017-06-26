@@ -6,7 +6,7 @@ import logging
 from time import strftime
 from logging.handlers import RotatingFileHandler
 
-class LogginMange(object):
+class LogginMange:
     """
     Logging模块管理
     """
