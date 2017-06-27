@@ -27,7 +27,7 @@ function InitCpuChart(data)
   option = {
     title : {
         text: '服务器CPU使用率',
-        subtext: '数据来自服务器'
+        subtext: '数据来自服务器59'
     },
     tooltip : {
         trigger: 'axis'
@@ -118,7 +118,7 @@ function InitMemoryChart(data)
    option = {
     title : {
         text: '服务器内存使用率',
-        subtext: '数据来自服务器'
+        subtext: '数据来自服务器59'
     },
     tooltip : {
         trigger: 'axis'
