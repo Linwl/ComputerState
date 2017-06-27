@@ -1,7 +1,6 @@
 #!usr/bin/env python
 #coding:utf-8
 
-import os.path
 
 import tornado.httpserver
 import tornado.ioloop
@@ -10,6 +9,8 @@ import tornado.web
 from tornado.options import define, options
 from Service import ServerMonitor
 import ConfigParser
+import inspect
+import os
 from Service import LogginMange
 
 
@@ -37,7 +38,9 @@ class Application(tornado.web.Application):
 class IndexHandler(tornado.web.RequestHandler):
 
      def init_log(self):
-         return  LogginMange.LogginMange("Index", "Config/logger.conf")
+         this_file = inspect.getfile(inspect.currentframe())
+         dirpath = os.path.abspath(os.path.dirname(this_file))
+         return  LogginMange.LogginMange(dirpath+'/Log','Index')
 
      def get(self):
         server = ServerMonitor.ServerMonitor()
@@ -62,18 +65,26 @@ class ServerMonitoring():
     """
     服务器监控
     """
-    # def __init__(self):
-    #     self.log = LogginMange.LogginMange("Index", "Config/logger.conf")
+    def __init__(self):
+        this_file = inspect.getfile(inspect.currentframe())
+        self.dirpath = os.path.abspath(os.path.dirname(this_file))
+        self.log = LogginMange.LogginMange(self.dirpath+'/Log','Index')
 
     def start(self):
+        self.log.info("开始监控!")
         try:
             config = ConfigParser.ConfigParser()
-            config.readfp(open('Config/Init.congfig'), "rb")
+            config.readfp(open(self.dirpath+'/Config/Init.congfig'), "rb")
             port = int(config.get('Server_config', 'port_one'))
             tornado.options.parse_command_line()
             http_server = tornado.httpserver.HTTPServer(Application())
             http_server.listen(port)
             tornado.ioloop.IOLoop.instance().start()
             self.log.info("开始服务器监控")
-        except Exception, e:
+        except Exception,e:
             self.log.error(e.message)
+
+
+if __name__ == '__main__':
+    a =ServerMonitoring()
+    a.start()

@@ -5,21 +5,26 @@ import logging.config
 import logging
 from time import strftime
 from logging.handlers import RotatingFileHandler
-
+import inspect
+import os
 class LogginMange:
     """
     Logging模块管理
     """
     _Version='1.0.2017.03.03'
     #通过配置文件路径设置日志参数
-    def __init__(self,logname,confpath):
-        logging.config.fileConfig(confpath)
-        Rthandler = RotatingFileHandler('Log/'+logname+'_'+strftime("%Y-%m-%d")+'.log', maxBytes=10 * 1024 * 1024, backupCount=5)
-        Rthandler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s')
-        Rthandler.setFormatter(formatter)
-        logging.getLogger('pyLog').addHandler(Rthandler)
-        self.logger = logging.getLogger('pyLog')
+    def __init__(self,logpath,logname):
+        self.logger = self.get_logger(logpath,logname)
+
+    def get_logger(self,logpath,logname):
+        logger = logging.getLogger('['+logname+']')
+        handler = logging.FileHandler(os.path.join(logpath, logname+'_'+strftime("%Y-%m-%d")+'.log'))
+        formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+        handler.setFormatter(formatter)
+
+        logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+        return logger
 
     def debug(self,msg):
         self.logger.debug(msg)

@@ -2,10 +2,13 @@
 import win32serviceutil
 import win32service
 import win32event
+import Index
+import inspect
+import os
 from Service import LogginMange
 
 
-class PythonService(win32serviceutil.ServiceFramework):
+class windowService(win32serviceutil.ServiceFramework):
     """
     Usage: 'PythonService.py [options] install|update|remove|start [...]|stop|restart [...]|debug [...]'
     Options for 'install' and 'update' commands only:
@@ -23,28 +26,32 @@ class PythonService(win32serviceutil.ServiceFramework):
                      the specified period.
     """
     # 服务名
-    _svc_name_ = "PythonService"
+    _svc_name_ = "ServerService"
     # 服务显示名称
-    _svc_display_name_ = "Python Service Monitor"
+    _svc_display_name_ = "Server Service Monitor"
     # 服务描述
-    _svc_description_ = "Service Monitor"
+    _svc_description_ = "Server Monitor"
 
     def __init__(self, args):
         win32serviceutil.ServiceFramework.__init__(self, args)
         self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
-        self.logger = LogginMange.LogginMange("Index", "Config/logger.conf")
+        self.server = Index.ServerMonitoring()
+        self.logger = self.getlogger()
         self.isAlive = True
+
+    def getlogger(self):
+        this_file = inspect.getfile(inspect.currentframe())
+        dirpath = os.path.abspath(os.path.dirname(this_file))
+        logger =LogginMange.LogginMange(dirpath+'/Log', "Service")
+        return logger
 
     def SvcDoRun(self):
         import time
-        import Index
-
-        self.logger.error("svc do run....")
-        server = Index.ServerMonitoring();
-        server.start()
-        # while self.isAlive:
-        #     self.logger.error("I am alive.")
-        #     time.sleep(1)
+        self.logger.info("svc do run....")
+        self.server.start()
+        while self.isAlive:
+            self.logger.info("I am alive.")
+            time.sleep(1)
         #     # 等待服务被停止
         #     # win32event.WaitForSingleObject(self.hWaitStop, win32event.INFINITE)
 
@@ -58,4 +65,4 @@ class PythonService(win32serviceutil.ServiceFramework):
 
 
 if __name__ == '__main__':
-    win32serviceutil.HandleCommandLine(PythonService)
+    win32serviceutil.HandleCommandLine(windowService)
